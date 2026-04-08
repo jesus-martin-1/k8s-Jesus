@@ -13,16 +13,10 @@ spec:
       labels:
         app: backend
     spec:
-      # VULNERABILIDAD INTRODUCIDA: hostNetwork permite acceso a la red del host
-      # KICS: "Host Network Access" - introducida
-      hostNetwork: true
-      # VULNERABILIDAD INTRODUCIDA: hostPID permite ver procesos del host
-      # KICS: "Host PID Access" - introducida
-      hostPID: true
       containers:
         - name: backend
           image: backend-app:latest
-          imagePullPolicy: Never
+          imagePullPolicy: Never          # Para usar imagen local en Codespaces
           ports:
             - containerPort: 3000
           env:
@@ -31,13 +25,10 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: DATABASE_URL
-          securityContext:
-            # VULNERABILIDAD INTRODUCIDA: Contenedor con privilegios
-            # KICS: "Container Is Privileged" - introducida
-            privileged: true
-            # VULNERABILIDAD INTRODUCIDA: Permite escalada de privilegios
-            # KICS: "Container Allows Privilege Escalation" - introducida
-            allowPrivilegeEscalation: true
-            # VULNERABILIDAD INTRODUCIDA: Ejecuta como root
-            # KICS: "Container Running As Root" - introducida
-            runAsUser: 0
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
