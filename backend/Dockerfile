@@ -1,13 +1,14 @@
-# VULNERABILIDAD INTRODUCIDA: Imagen con tag "latest" en lugar de versión fija
-# KICS: "Image Tag Should Be Fixed" - introducida
-FROM node:latest
+FROM node:18
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 3000
 
-# VULNERABILIDAD INTRODUCIDA: Ejecutar como root (sin USER)
-# KICS: "Container Running As Root" - introducida
+# CORRECCIÓN: Añadir usuario no-root para evitar ejecutar como root
+# KICS: "Missing User Instruction" - corregida
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
+
+EXPOSE 3000
 CMD ["node", "index.js"]

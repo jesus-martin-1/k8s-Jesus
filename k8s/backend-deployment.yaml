@@ -16,7 +16,7 @@ spec:
       containers:
         - name: backend
           image: backend-app:latest
-          imagePullPolicy: Never          # Para usar imagen local en Codespaces
+          imagePullPolicy: Never
           ports:
             - containerPort: 3000
           env:
@@ -25,6 +25,21 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: DATABASE_URL
+          # CORRECCIÓN: securityContext seguro
+          # KICS: "Container Is Privileged" - corregida
+          # KICS: "Container Allows Privilege Escalation" - corregida
+          # KICS: "Container Running As Root" - corregida
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          # CORRECCIÓN: Límites de recursos definidos
+          # KICS: "Pod or Container Without LimitRange" - corregida
           resources:
             requests:
               cpu: "100m"
