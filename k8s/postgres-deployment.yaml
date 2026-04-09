@@ -12,24 +12,27 @@ spec:
     metadata:
       labels:
         app: postgres
-    spec: # <--- Este es el spec del Pod
-      securityContext: # <--- AGREGA ESTO AQUÍ
-        fsGroup: 999
+    spec:
       containers:
-      - name: postgres
-        image: postgres:latest
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: password
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
       volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-pvc
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: postgres-pvc
