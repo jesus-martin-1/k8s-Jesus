@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 set -e
 
 echo "==> Iniciando clúster con minikube..."
@@ -12,13 +13,14 @@ echo "==> Habilitando metrics-server para HPA..."
 minikube addons enable metrics-server
 
 echo "==> Aplicando manifiestos de Kubernetes..."
-echo "Esperando a que el namespace se sincronice..."
-sleep 2 
-
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/postgres-secret.yaml
+kubectl apply -f k8s/postgres-pvc.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/postgres-service.yaml
 kubectl apply -f k8s/backend-deployment.yaml
 kubectl apply -f k8s/backend-service.yaml
 kubectl apply -f k8s/hpa.yaml
-kubectl apply -f k8s/
 
 echo "==> Esperando a que los pods estén listos..."
 kubectl rollout status deployment/postgres -n tasks-app
