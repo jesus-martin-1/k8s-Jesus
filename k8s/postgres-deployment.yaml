@@ -12,38 +12,24 @@ spec:
     metadata:
       labels:
         app: postgres
-    spec:
+    spec: # <--- Este es el spec del Pod
+      securityContext: # <--- AGREGA ESTO AQUÍ
+        fsGroup: 999
       containers:
-        - name: postgres
-          image: postgres:15
-          envFrom:
-            - secretRef:
-                name: postgres-secret
-          ports:
-            - containerPort: 5432
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-          securityContext:
-            # CORRECCIÓN: Deshabilitar escalada de privilegios
-            # KICS: "Privilege Escalation Allowed" - corregida
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 999
-            capabilities:
-              drop:
-                - ALL
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: pgdata
-              # CORRECCIÓN: Montar en subdirectorio para evitar permisos de escritura en directorio del SO
-              # KICS: "Volume Mount With OS Directory Write Permissions" - corregida
-              subPath: pgdata
+      - name: postgres
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
       volumes:
-        - name: pgdata
-          persistentVolumeClaim:
-            claimName: postgres-pvc
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
