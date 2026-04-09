@@ -12,6 +12,12 @@ echo "==> Habilitando metrics-server para HPA..."
 minikube addons enable metrics-server
 
 echo "==> Aplicando manifiestos de Kubernetes..."
+echo "Esperando a que el namespace se sincronice..."
+sleep 2 
+
+kubectl apply -f k8s/backend-deployment.yaml
+kubectl apply -f k8s/backend-service.yaml
+kubectl apply -f k8s/hpa.yaml
 kubectl apply -f k8s/
 
 echo "==> Esperando a que los pods estén listos..."
