@@ -31,3 +31,7 @@ kubectl get all -n tasks-app
 
 echo "==> URL de acceso:"
 minikube service backend-service -n tasks-app --url
+
+echo "==> Iniciando port-forward en puerto 3000..."
+echo "    Abre la pestaña Ports en VS Code y haz clic en el puerto 3000"
+kubectl port-forward service/backend-service 3000:3000 -n tasks-app
